@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Halloween-kort</title>
+  
+  <!-- FAVICON -->
   <link rel="icon" type="image/png" href="spooky.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,30 +29,25 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* 3D Scene setup */
     .perspective-scene {
       perspective: 2200px;
       perspective-origin: center center;
     }
 
-    /* Card Book Base - shifts smoothly to center when opening/closing */
     .card-book {
       position: relative;
       transform-style: preserve-3d;
       transition: transform 0.85s cubic-bezier(0.35, 1, 0.45, 1);
     }
 
-    /* When closed: spine shifts so cover is dead-center */
     .card-book.is-closed {
       transform: translateX(-50%);
     }
 
-    /* When open: spine is dead-center so both open pages are balanced */
     .card-book.is-open {
       transform: translateX(0%);
     }
 
-    /* The Hinged 3D Front Cover */
     .cover-flap {
       transform-origin: left center;
       transform-style: preserve-3d;
@@ -66,7 +64,6 @@
       cursor: default;
     }
 
-    /* Faces with 3D backface cull */
     .flap-face {
       position: absolute;
       inset: 0;
@@ -87,7 +84,6 @@
       z-index: 5;
     }
 
-    /* Backgrounds & Textures */
     .parchment {
       background: linear-gradient(135deg, #160e1f 0%, #20132b 50%, #11081a 100%);
       box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85);
@@ -98,7 +94,6 @@
       box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.9);
     }
 
-    /* Realistic Center Spine Shadow */
     .spine-crease {
       position: absolute;
       top: 0;
@@ -111,7 +106,6 @@
       z-index: 40;
     }
 
-    /* Glow flickers */
     @keyframes glowFlicker {
       0%, 100% {
         filter: drop-shadow(0 0 12px #ff8c00) drop-shadow(0 0 24px rgba(255, 140, 0, 0.6));
@@ -125,7 +119,6 @@
       animation: glowFlicker 2s infinite ease-in-out;
     }
 
-    /* Steam bubbles */
     @keyframes bubbleUp {
       0% { transform: translateY(0) scale(0.6); opacity: 0.2; }
       50% { opacity: 0.9; }
@@ -136,7 +129,6 @@
     .bubble-2 { animation: bubbleUp 2.2s infinite ease-in 0.5s; }
     .bubble-3 { animation: bubbleUp 1.6s infinite ease-in 1s; }
 
-    /* Flying treats */
     @keyframes flyPop {
       0% {
         transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
@@ -158,16 +150,13 @@
 </head>
 <body class="min-h-screen text-gray-200 select-none flex flex-col justify-between relative overflow-y-auto">
 
-  <!-- Ambient Sky Canvas -->
   <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-  <!-- Glowing Moon -->
   <div class="fixed top-8 right-8 sm:right-20 w-28 h-28 sm:w-44 sm:h-44 rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200/90 pointer-events-none z-0 shadow-[0_0_80px_25px_rgba(255,170,50,0.2)] opacity-85">
     <div class="absolute top-6 left-8 w-6 h-6 rounded-full bg-orange-950/10 blur-[1px]"></div>
     <div class="absolute bottom-9 left-12 w-10 h-10 rounded-full bg-orange-950/10 blur-[2px]"></div>
   </div>
 
-  <!-- Header Controls -->
   <header class="relative z-50 w-full max-w-5xl mx-auto px-4 pt-4 flex flex-wrap gap-2 justify-between items-center">
     <div class="flex items-center space-x-2">
       <span class="text-3xl filter drop-shadow">🎃</span>
@@ -177,39 +166,30 @@
     </div>
 
     <div class="flex items-center space-x-2">
-      <!-- Toggle Card Button (Folds and Unfolds the 3D cover) -->
       <button id="card-toggle-btn" class="px-4 py-1.5 rounded-full bg-orange-600 hover:bg-orange-500 text-black font-semibold text-xs sm:text-sm shadow-[0_0_15px_rgba(234,88,12,0.6)] transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
         <span id="card-toggle-icon">📖</span>
         <span id="card-toggle-text">Öppna kortet</span>
       </button>
 
-      <!-- Audio Button -->
       <button id="sound-btn" class="px-3.5 py-1.5 rounded-full bg-zinc-900/90 border border-orange-500/40 text-orange-400 hover:text-white transition-colors text-xs sm:text-sm backdrop-blur cursor-pointer">
         <span id="sound-icon">🔇</span> Ljud: Av
       </button>
 
-      <!-- Thunder Button -->
       <button id="thunder-btn" class="px-3 py-1.5 rounded-full bg-purple-900/40 border border-purple-500/50 text-purple-300 hover:bg-purple-800/60 transition-colors text-xs sm:text-sm cursor-pointer">
         ⚡ Åska
       </button>
     </div>
   </header>
 
-  <!-- Main Presentation Area with Responsive 3D Book -->
   <main class="relative z-30 flex-1 flex flex-col items-center justify-center p-3 sm:p-6 my-auto">
-
-    <!-- Scaler container so the card fits all phone screens perfectly without clipping -->
     <div id="card-scaler" class="transition-transform duration-300 flex items-center justify-center">
-
       <div class="perspective-scene py-4">
         
-        <!-- CARD BOOK: Fixed spine along x=0. Base page is on the right, Flap flips to the left! -->
         <div id="card-book" class="card-book is-closed w-[340px] sm:w-[380px] h-[510px]">
 
-          <!-- SPINE CREASE SHADOW (Appears down the middle when open) -->
           <div id="spine-shadow" class="spine-crease opacity-0 transition-opacity duration-700"></div>
 
-          <!-- 1. BASE PAGE (Inside Right: The Poem & Names) -->
+          <!-- INSIDAN HÖGER (Dikten och fälten) -->
           <div class="absolute inset-0 w-full h-full parchment rounded-2xl border-2 border-orange-500/40 shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-6 sm:p-7 flex flex-col justify-between z-10 overflow-hidden">
             <div>
               <div class="flex items-center justify-between border-b border-orange-500/25 pb-2 mb-3">
@@ -217,7 +197,6 @@
                 <span class="text-xs text-orange-400">🍂 31 Oktober</span>
               </div>
 
-              <!-- Halloween Poem (No personal/flattering text) -->
               <div class="bg-black/45 border-l-2 border-orange-500/60 pl-3.5 py-2.5 my-2.5 rounded-r">
                 <p class="font-serif italic text-xs sm:text-sm text-stone-200 leading-relaxed whitespace-pre-line">
 När höststormen viner och skymningen sänks,
@@ -229,7 +208,7 @@ med spänning och godis från hit och till dit!
                 </p>
               </div>
 
-              <!-- Till & Från Fält -->
+              <!-- Inputfält med standard Lars och Tom -->
               <div class="mt-4 space-y-2.5">
                 <div>
                   <label class="block text-[11px] font-semibold tracking-wide text-orange-300 uppercase">Till:</label>
@@ -239,13 +218,13 @@ med spänning och godis från hit och till dit!
 
                 <div>
                   <label class="block text-[11px] font-semibold tracking-wide text-orange-300 uppercase">Från:</label>
-                  <input id="sender-input" type="text" value="Tom" placeholder="Ditt eller era namn..." 
+                  <input id="sender-input" type="text" value="Tom" placeholder="Ditt namn..." 
                     class="w-full bg-zinc-900/90 border border-orange-500/40 rounded px-2.5 py-1.5 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-orange-400">
                 </div>
               </div>
             </div>
 
-            <!-- Bottom Close Action Bar -->
+            <!-- Nederkant med Till Lars • Från Tom -->
             <div class="pt-3 border-t border-orange-500/20 flex items-center justify-between text-xs">
               <span id="sender-display" class="font-cinzel text-orange-300 font-bold truncate max-w-[200px]">
                 Till Lars • Från Tom
@@ -257,19 +236,17 @@ med spänning och godis från hit och till dit!
             </div>
           </div>
 
-          <!-- 2. HINGED 3D COVER FLAP (Flips 180° like a real book cover) -->
+          <!-- OMSLAGET -->
           <div id="cover-flap" class="cover-flap absolute inset-0 w-full h-full z-20">
 
-            <!-- FRONT OF COVER (Visible when closed) -->
+            <!-- Framsidan med Till: Lars • Från: Tom -->
             <div id="flap-front" class="flap-face flap-front cover-bg border-2 border-orange-500/50 p-6 sm:p-7 flex flex-col items-center justify-between text-center shadow-[0_20px_60px_rgba(0,0,0,0.95)]">
               
-              <!-- Spiderweb decoration -->
               <svg class="absolute top-2 left-2 w-16 h-16 opacity-30 text-orange-400 pointer-events-none" viewBox="0 0 100 100" fill="none" stroke="currentColor">
                 <path d="M0 0 L100 0 C70 30 70 70 0 100 L0 0 Z" stroke-width="1.5"/>
                 <path d="M0 0 L70 70 M0 35 C35 35 35 35 35 0 M0 70 C70 70 70 70 70 0" stroke-width="1.2"/>
               </svg>
 
-              <!-- Cover Title -->
               <div class="mt-2 space-y-1">
                 <p class="text-[11px] uppercase tracking-widest text-orange-400/90 font-cinzel">En stämningsfull hälsning</p>
                 <h1 class="text-4xl sm:text-5xl font-creepster text-orange-500 tracking-wider drop-shadow-[0_2px_12px_rgba(255,115,0,0.8)]">
@@ -280,7 +257,6 @@ med spänning och godis från hit och till dit!
                 </p>
               </div>
 
-              <!-- Pumpkin SVG -->
               <div class="relative my-2 flex items-center justify-center">
                 <div class="absolute w-36 h-36 rounded-full bg-orange-600/20 blur-xl"></div>
                 <svg class="w-40 h-40 sm:w-44 sm:h-44 flicker-glow" viewBox="0 0 200 200">
@@ -299,14 +275,13 @@ med spänning och godis från hit och till dit!
                 </svg>
               </div>
 
-              <!-- Click to open prompt -->
               <div class="mb-1 inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-orange-950/80 border border-orange-500/50 text-orange-300 text-xs sm:text-sm font-semibold tracking-wide shadow-lg">
                 <span>✨ Klicka här för att öppna</span>
                 <span>➔</span>
               </div>
             </div>
 
-            <!-- BACK OF COVER (Inside Left: Witch Cauldron, visible when open) -->
+            <!-- INSIDAN VÄNSTER (Häxans kittel) -->
             <div id="flap-back" class="flap-face flap-back parchment border-2 border-orange-500/40 p-6 sm:p-7 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
               <div>
                 <div class="flex items-center justify-between border-b border-orange-500/25 pb-2 mb-2">
@@ -318,16 +293,13 @@ med spänning och godis från hit och till dit!
                 </p>
               </div>
 
-              <!-- Cauldron Graphic & Bubbles -->
               <div class="relative py-2 flex flex-col items-center justify-center">
-                <!-- Rising Green Steam Bubbles -->
                 <div class="relative w-28 h-7 flex justify-center items-end">
                   <span class="bubble-1 absolute left-6 w-3 h-3 rounded-full bg-lime-400/80 blur-[1px]"></span>
                   <span class="bubble-2 absolute left-12 w-4 h-4 rounded-full bg-emerald-400/80 blur-[1px]"></span>
                   <span class="bubble-3 absolute right-6 w-3.5 h-3.5 rounded-full bg-green-300/80 blur-[1px]"></span>
                 </div>
 
-                <!-- Clickable Cauldron -->
                 <div id="cauldron-container" class="relative cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95" title="Klicka på grytan!">
                   <svg class="w-36 h-32 sm:w-40 sm:h-36 drop-shadow-[0_12px_22px_rgba(0,0,0,0.95)]" viewBox="0 0 200 170">
                     <ellipse cx="100" cy="55" rx="66" ry="18" fill="#15803d" />
@@ -342,13 +314,11 @@ med spänning och godis från hit och till dit!
                   </svg>
                 </div>
 
-                <!-- Stir Button -->
                 <button id="stir-btn" type="button" class="mt-3 px-4 py-2 bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-500 hover:to-lime-500 text-black font-bold text-xs uppercase tracking-wider rounded-lg shadow-lg shadow-emerald-950/60 transition-all active:scale-95 cursor-pointer">
                   🥄 Rör om i grytan!
                 </button>
               </div>
 
-              <!-- Treat Box -->
               <div id="treat-box" class="p-2.5 rounded-lg bg-black/60 border border-emerald-500/40 text-center text-xs sm:text-sm font-medium text-lime-300 min-h-[44px] flex items-center justify-center transition-all">
                 Klicka på grytan eller knappen! 🦇
               </div>
@@ -364,15 +334,11 @@ med spänning och godis från hit och till dit!
 
   </main>
 
-  <!-- Footer -->
   <footer class="relative z-40 py-3 text-center text-xs text-stone-500 bg-black/70 border-t border-zinc-900">
     <p>Halloween-kort • Skapat för att sprida höstglädje</p>
   </footer>
 
   <script>
-    /* -------------------------------------------------------------
-       1. WEB AUDIO API SYNTHESIZER (No external sound files)
-       ------------------------------------------------------------- */
     let audioCtx = null;
     let isSoundOn = false;
 
@@ -386,7 +352,6 @@ med spänning och godis från hit och till dit!
       return audioCtx;
     }
 
-    /* Card Opening / Closing Paper Whoosh */
     function playFlipSound(isClosing = false) {
       if (!isSoundOn) return;
       const ctx = getAudioContext();
@@ -413,7 +378,6 @@ med spänning och godis från hit och till dit!
       osc.stop(ctx.currentTime + 0.33);
     }
 
-    /* Chime sound for open & treats */
     function playChimeSound() {
       if (!isSoundOn) return;
       const ctx = getAudioContext();
@@ -434,7 +398,6 @@ med spänning och godis från hit och till dit!
       });
     }
 
-    /* Potion bubble sound */
     function playBubbleSound() {
       if (!isSoundOn) return;
       const ctx = getAudioContext();
@@ -455,7 +418,6 @@ med spänning och godis från hit och till dit!
       osc.stop(ctx.currentTime + 0.15);
     }
 
-    /* Thunder crash sound */
     function playThunderSound() {
       const ctx = getAudioContext();
       const bufferSize = ctx.sampleRate * 1.5;
@@ -489,9 +451,6 @@ med spänning och godis från hit och till dit!
       noise.start();
     }
 
-    /* -------------------------------------------------------------
-       2. CONTROLS SETUP
-       ------------------------------------------------------------- */
     const soundBtn = document.getElementById('sound-btn');
     const soundIcon = document.getElementById('sound-icon');
     const thunderBtn = document.getElementById('thunder-btn');
@@ -524,9 +483,6 @@ med spänning och godis från hit och till dit!
       }, 70);
     });
 
-    /* -------------------------------------------------------------
-       3. 3D FOLD CARD OPEN & CLOSE ENGINE
-       ------------------------------------------------------------- */
     const cardBook = document.getElementById('card-book');
     const coverFlap = document.getElementById('cover-flap');
     const flapFront = document.getElementById('flap-front');
@@ -542,15 +498,12 @@ med spänning och godis från hit och till dit!
       if (isOpen) return;
       isOpen = true;
 
-      // 3D Flip Open
       cardBook.classList.remove('is-closed');
       cardBook.classList.add('is-open');
 
-      // Show spine crease shadow
       spineShadow.classList.remove('opacity-0');
       spineShadow.classList.add('opacity-100');
 
-      // Update button text
       cardToggleText.textContent = 'Stäng kortet';
       cardToggleIcon.textContent = '📕';
 
@@ -562,15 +515,12 @@ med spänning och godis från hit och till dit!
       if (!isOpen) return;
       isOpen = false;
 
-      // 3D Flip Closed
       cardBook.classList.remove('is-open');
       cardBook.classList.add('is-closed');
 
-      // Hide spine crease shadow
       spineShadow.classList.add('opacity-0');
       spineShadow.classList.remove('opacity-100');
 
-      // Update button text
       cardToggleText.textContent = 'Öppna kortet';
       cardToggleIcon.textContent = '📖';
 
@@ -585,26 +535,20 @@ med spänning och godis från hit och till dit!
       }
     }
 
-    // Clicking the front cover when closed opens it
     flapFront.addEventListener('click', () => {
       if (!isOpen) openCard();
     });
 
-    // Top action bar button toggles
     cardToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleCard();
     });
 
-    // Inside close button shuts the card
     closeCardBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       closeCard();
     });
 
-    /* -------------------------------------------------------------
-       4. WITCH CAULDRON ACTIONS & CANDY BURSTS
-       ------------------------------------------------------------- */
     const cauldronContainer = document.getElementById('cauldron-container');
     const stirBtn = document.getElementById('stir-btn');
     const treatBox = document.getElementById('treat-box');
@@ -637,7 +581,6 @@ med spänning och godis från hit och till dit!
         treatBox.classList.remove('bg-lime-950/50');
       }, 400);
 
-      // Spawn flying candy bursts
       const rect = cauldronContainer.getBoundingClientRect();
       const originX = rect.left + rect.width / 2;
       const originY = rect.top + 30;
@@ -665,9 +608,7 @@ med spänning och godis från hit och till dit!
     cauldronContainer.addEventListener('click', stirCauldron);
     stirBtn.addEventListener('click', stirCauldron);
 
-    /* -------------------------------------------------------------
-       5. INPUTS MED AUTOMATISK UPPDATERING
-       ------------------------------------------------------------- */
+    // KOPPLING FÖR TILL OCH FRÅN
     const recipientInput = document.getElementById('recipient-input');
     const senderInput = document.getElementById('sender-input');
     const coverSubLabel = document.getElementById('cover-sub-label');
@@ -677,19 +618,13 @@ med spänning och godis från hit och till dit!
       const toVal = recipientInput.value.trim() || 'Lars';
       const fromVal = senderInput.value.trim() || 'Tom';
 
-      // Uppdatera omslagets framsida
       coverSubLabel.textContent = `Till: ${toVal} • Från: ${fromVal}`;
-
-      // Uppdatera insidan
       senderDisplay.textContent = `Till ${toVal} • Från ${fromVal}`;
     }
 
     recipientInput.addEventListener('input', updateNames);
     senderInput.addEventListener('input', updateNames);
 
-    /* -------------------------------------------------------------
-       6. DYNAMIC SCALE ENGINE FOR MOBILE SCREENS
-       ------------------------------------------------------------- */
     function adjustCardScale() {
       const scaler = document.getElementById('card-scaler');
       const screenWidth = window.innerWidth;
@@ -715,9 +650,6 @@ med spänning och godis från hit och till dit!
       adjustCardScale();
     };
 
-    /* -------------------------------------------------------------
-       7. AMBIENT BACKGROUND PARTICLES & BATS
-       ------------------------------------------------------------- */
     const canvas = document.getElementById('ambient-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
