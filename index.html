@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Halloween-kort</title>
+  <link rel="icon" type="image/png" href="spooky.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -232,13 +233,13 @@ med spänning och godis från hit och till dit!
               <div class="mt-4 space-y-2.5">
                 <div>
                   <label class="block text-[11px] font-semibold tracking-wide text-orange-300 uppercase">Till:</label>
-                  <input id="recipient-input" type="text" placeholder="Skriv namn här..." 
+                  <input id="recipient-input" type="text" value="Lars" placeholder="Skriv namn här..." 
                     class="w-full bg-zinc-900/90 border border-orange-500/40 rounded px-2.5 py-1.5 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-orange-400">
                 </div>
 
                 <div>
                   <label class="block text-[11px] font-semibold tracking-wide text-orange-300 uppercase">Från:</label>
-                  <input id="sender-input" type="text" placeholder="Ditt eller era namn..." 
+                  <input id="sender-input" type="text" value="Tom" placeholder="Ditt eller era namn..." 
                     class="w-full bg-zinc-900/90 border border-orange-500/40 rounded px-2.5 py-1.5 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-orange-400">
                 </div>
               </div>
@@ -246,8 +247,8 @@ med spänning och godis från hit och till dit!
 
             <!-- Bottom Close Action Bar -->
             <div class="pt-3 border-t border-orange-500/20 flex items-center justify-between text-xs">
-              <span id="sender-display" class="font-cinzel text-orange-300 font-bold truncate max-w-[150px]">
-                Från: Vännerna
+              <span id="sender-display" class="font-cinzel text-orange-300 font-bold truncate max-w-[200px]">
+                Till Lars • Från Tom
               </span>
 
               <button id="close-card-btn" class="px-3.5 py-1.5 bg-orange-950/80 hover:bg-orange-900 text-orange-200 rounded border border-orange-500/40 text-xs font-medium transition-all active:scale-95 cursor-pointer">
@@ -275,7 +276,7 @@ med spänning och godis från hit och till dit!
                   GLAD HALLOWEEN!
                 </h1>
                 <p id="cover-sub-label" class="text-orange-200/90 font-cinzel text-xs sm:text-sm">
-                  I Höstmörkrets Tid
+                  Till: Lars • Från: Tom
                 </p>
               </div>
 
@@ -561,7 +562,7 @@ med spänning och godis från hit och till dit!
       if (!isOpen) return;
       isOpen = false;
 
-      // 3D Flip Closed (folds cover back like the original card!)
+      // 3D Flip Closed
       cardBook.classList.remove('is-open');
       cardBook.classList.add('is-closed');
 
@@ -665,29 +666,32 @@ med spänning och godis från hit och till dit!
     stirBtn.addEventListener('click', stirCauldron);
 
     /* -------------------------------------------------------------
-       5. INPUTS
+       5. INPUTS MED AUTOMATISK UPPDATERING
        ------------------------------------------------------------- */
     const recipientInput = document.getElementById('recipient-input');
     const senderInput = document.getElementById('sender-input');
     const coverSubLabel = document.getElementById('cover-sub-label');
     const senderDisplay = document.getElementById('sender-display');
 
-    recipientInput.addEventListener('input', (e) => {
-      const val = e.target.value.trim();
-      coverSubLabel.textContent = val ? `Till: ${val}` : 'I Höstmörkrets Tid';
-    });
+    function updateNames() {
+      const toVal = recipientInput.value.trim() || 'Lars';
+      const fromVal = senderInput.value.trim() || 'Tom';
 
-    senderInput.addEventListener('input', (e) => {
-      const val = e.target.value.trim();
-      senderDisplay.textContent = val ? `Från: ${val}` : 'Från: Vännerna';
-    });
+      // Uppdatera omslagets framsida
+      coverSubLabel.textContent = `Till: ${toVal} • Från: ${fromVal}`;
+
+      // Uppdatera insidan
+      senderDisplay.textContent = `Till ${toVal} • Från ${fromVal}`;
+    }
+
+    recipientInput.addEventListener('input', updateNames);
+    senderInput.addEventListener('input', updateNames);
 
     /* -------------------------------------------------------------
        6. DYNAMIC SCALE ENGINE FOR MOBILE SCREENS
        ------------------------------------------------------------- */
     function adjustCardScale() {
       const scaler = document.getElementById('card-scaler');
-      // When opened, the 2-page spread is ~760px wide; on small devices we scale it smoothly
       const screenWidth = window.innerWidth;
       const targetWidth = isOpen ? 790 : 400;
 
@@ -700,7 +704,6 @@ med spänning och godis från hit och till dit!
     }
 
     window.addEventListener('resize', adjustCardScale);
-    // Also re-adjust when opening/closing
     const originalOpen = openCard;
     openCard = function() {
       originalOpen();
